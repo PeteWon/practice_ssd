@@ -33,27 +33,12 @@ jobs:
       with:
         python-version: '3.12'
 
-    # - name: Install matching Chrome + Chromedriver
-    #   run: |
-    #     sudo apt-get update
-    #     sudo apt-get install -y unzip curl chromium-browser
-
-    #     CHROMEDRIVER_VERSION=137.0.7151.119
-    #     curl -Lo chromedriver.zip https://edgedl.me.gvt1.com/edgedl/chrome/chrome-for-testing/$CHROMEDRIVER_VERSION/linux64/chromedriver-linux64.zip
-    #     unzip chromedriver.zip
-    #     sudo mv chromedriver-linux64/chromedriver /usr/bin/chromedriver
-    #     sudo chmod +x /usr/bin/chromedriver
-
     - name: Install Python Dependencies
       run: pip install -r web/requirements.txt
 
     - name: Run Selenium Tests
       working-directory: ./web
       run: python test_selenium.py
-
-    - name: Tear down app stack
-      if: always()
-      run: docker compose down
 
     - name: Wait for SonarQube to be ready
       run: |
@@ -62,8 +47,20 @@ jobs:
           sleep 5
         done
 
+    - name: Install SonarScanner CLI
+      run: |
+        curl -sSLo sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-5.0.1.3006-linux.zip
+        unzip -q sonar-scanner.zip
+        echo "$PWD/sonar-scanner-5.0.1.3006-linux/bin" >> $GITHUB_PATH
+
     - name: SonarQube Scan
-      uses: sonarsource/sonarqube-scan-action@v2
-      env:
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        SONAR_HOST_URL: http://localhost:9000
+      run: |
+        sonar-scanner \
+          -Dsonar.projectKey=ssd-practical-test \
+          -Dsonar.sources=web \
+          -Dsonar.host.url=http://localhost:9000 \
+          -Dsonar.token=${{ secrets.SONAR_TOKEN }}
+
+    - name: Tear down app stack
+      if: always()
+      run: docker compose down
