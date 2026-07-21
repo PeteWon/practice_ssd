@@ -33,16 +33,16 @@ jobs:
       with:
         python-version: '3.12'
 
-    - name: Install matching Chrome + Chromedriver
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y unzip curl chromium-browser
+    # - name: Install matching Chrome + Chromedriver
+    #   run: |
+    #     sudo apt-get update
+    #     sudo apt-get install -y unzip curl chromium-browser
 
-        CHROMEDRIVER_VERSION=137.0.7151.119
-        curl -Lo chromedriver.zip https://edgedl.me.gvt1.com/edgedl/chrome/chrome-for-testing/$CHROMEDRIVER_VERSION/linux64/chromedriver-linux64.zip
-        unzip chromedriver.zip
-        sudo mv chromedriver-linux64/chromedriver /usr/bin/chromedriver
-        sudo chmod +x /usr/bin/chromedriver
+    #     CHROMEDRIVER_VERSION=137.0.7151.119
+    #     curl -Lo chromedriver.zip https://edgedl.me.gvt1.com/edgedl/chrome/chrome-for-testing/$CHROMEDRIVER_VERSION/linux64/chromedriver-linux64.zip
+    #     unzip chromedriver.zip
+    #     sudo mv chromedriver-linux64/chromedriver /usr/bin/chromedriver
+    #     sudo chmod +x /usr/bin/chromedriver
 
     - name: Install Python Dependencies
       run: pip install -r web/requirements.txt
