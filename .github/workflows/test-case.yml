@@ -53,13 +53,20 @@ jobs:
         unzip -q sonar-scanner.zip
         echo "$PWD/sonar-scanner-5.0.1.3006-linux/bin" >> $GITHUB_PATH
 
+    - name: Generate SonarQube token
+      id: sonar_token
+      run: |
+        TOKEN=$(curl -s -u admin:admin -X POST "http://localhost:9000/api/user_tokens/generate" \
+          -d "name=ci-token-$(date +%s)" | grep -o '"token":"[^"]*' | cut -d'"' -f4)
+        echo "token=$TOKEN" >> $GITHUB_OUTPUT
+
     - name: SonarQube Scan
       run: |
         sonar-scanner \
           -Dsonar.projectKey=ssd-practical-test \
           -Dsonar.sources=web \
           -Dsonar.host.url=http://localhost:9000 \
-          -Dsonar.token=${{ secrets.SONAR_TOKEN }}
+          -Dsonar.token=${{ steps.sonar_token.outputs.token }}
 
     - name: Tear down app stack
       if: always()
