@@ -1,0 +1,8 @@
+[allowlist]
+description = "Ignore default SonarQube CI credentials (not real secrets)"
+paths = [
+  '''\.github/workflows/test-case\.yml'''
+]
+regexes = [
+  '''admin:admin'''
+]
