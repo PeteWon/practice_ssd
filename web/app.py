@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for
+import os
 
 app = Flask(__name__)
 
@@ -9,9 +10,16 @@ def meets_password_requirements(password):
         return False
     return True
 
+COMMON_PASSWORDS_FILE = os.path.join(os.path.dirname(__file__), "10-million-password-list-top-1000.txt")
+
+def load_common_passwords():
+    with open(COMMON_PASSWORDS_FILE, "r", encoding="utf-8", errors="ignore") as f:
+        return set(line.strip() for line in f if line.strip())
+
+COMMON_PASSWORDS = load_common_passwords()
+
 def is_common_password(password):
-    # TODO (Q4d): check against 10-million-password-list-top-1000.txt
-    return False
+    return password in COMMON_PASSWORDS
 
 @app.route("/", methods=["GET", "POST"])
 def home():
@@ -27,6 +35,8 @@ def home():
 @app.route("/welcome")
 def welcome():
     password = request.args.get("password", "")
+    if not meets_password_requirements(password) or is_common_password(password):
+        return redirect(url_for("home"))
     return render_template("welcome.html", password=password)
 
 if __name__ == "__main__":
